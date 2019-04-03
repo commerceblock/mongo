@@ -302,9 +302,13 @@ if [ "$originalArgOne" = 'mongod' ]; then
 
 		export MONGO_INITDB_DATABASE="${MONGO_INITDB_DATABASE:-test}"
 
-    if [ -f /run/secrets/mongo_pass ] && [ -f /run/secrets/mongo_user ]; then
-        export MONGO_PASSWORD="$(cat /run/secrets/mongo_pass)"
-        export MONGO_USERNAME="$(cat /run/secrets/mongo_user)"
+        if [ -f /run/secrets/mongo_pass ]; then
+            export MONGO_PASSWORD="$(cat /run/secrets/mongo_pass)"
+            if [ -f /run/secrets/mongo_user ]; then
+                export MONGO_USERNAME="$(cat /run/secrets/mongo_user)"
+            fi
+        fi
+		if [ "$MONGO_USERNAME" ] && [ "$MONGO_PASSWORD" ]; then
               "${mongo[@]}" "$MONGO_INITDB_DATABASE" <<-EOJS
 				db.createUser({
 					user: $(_js_escape "$MONGO_USERNAME"),
@@ -314,7 +318,7 @@ if [ "$originalArgOne" = 'mongod' ]; then
 			EOJS
         unset MONGO_PASSWORD
         unset MONGO_USERNAME
-		fi
+	    fi
 
 		echo
 		for f in /docker-entrypoint-initdb.d/*; do
