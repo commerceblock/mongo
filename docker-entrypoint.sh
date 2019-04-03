@@ -312,18 +312,6 @@ if [ "$originalArgOne" = 'mongod' ]; then
 			EOJS
 		fi
 
-#    if [ -f /run/secrets/mongo_pass ]; then
-#        export MONGO_PASSWORD="$(cat /run/secrets/mongo_pass)"
-#              "${mongo[@]}" "$MONGO_INITDB_DATABASE" <<-EOJS
-#				db.createUser({
-#					user: $(_js_escape "$MONGO_USERNAME"),
-#					pwd: $(_js_escape "$MONGO_PASSWORD"),
-#					roles: [ "readWrite", "dbAdmin" ]
-#				})
-#			EOJS
-#        unset MONGO_PASSWORD
-#		fi
-
 		echo
 		for f in /docker-entrypoint-initdb.d/*; do
 			case "$f" in
