@@ -302,7 +302,9 @@ if [ "$originalArgOne" = 'mongod' ]; then
 
 		export MONGO_INITDB_DATABASE="${MONGO_INITDB_DATABASE:-test}"
 
-		if [ "$MONGO_USERNAME" ] && [ "$MONGO_PASSWORD" ]; then
+    if [ -f /run/secrets/mongo_pass ] && [ -f /run/secrets/mongo_user ]; then
+        export MONGO_PASSWORD="$(cat /run/secrets/mongo_pass)"
+        export MONGO_USERNAME="$(cat /run/secrets/mongo_user)"
               "${mongo[@]}" "$MONGO_INITDB_DATABASE" <<-EOJS
 				db.createUser({
 					user: $(_js_escape "$MONGO_USERNAME"),
@@ -310,6 +312,8 @@ if [ "$originalArgOne" = 'mongod' ]; then
 					roles: [ "readWrite", "dbAdmin" ]
 				})
 			EOJS
+        unset MONGO_PASSWORD
+        unset MONGO_USERNAME
 		fi
 
 		echo
