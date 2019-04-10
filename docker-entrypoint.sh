@@ -178,8 +178,14 @@ _dbPath() {
 }
 
 if [ "$originalArgOne" = 'mongod' ]; then
-	file_env 'MONGO_INITDB_ROOT_USERNAME'
-	file_env 'MONGO_INITDB_ROOT_PASSWORD'
+
+    if [ -f /run/secrets/mongo_root_pass ]; then
+        export MONGO_INITDB_ROOT_PASSWORD="$(cat /run/secrets/mongo_root_pass)"
+        if [ -f /run/secrets/mongo_root_user ]; then
+            export MONGO_INITDB_ROOT_USERNAME="$(cat /run/secrets/mongo_root_user)"
+        fi
+    fi
+
 	# pre-check a few factors to see if it's even worth bothering with initdb
 	shouldPerformInitdb=
 	if [ "$MONGO_INITDB_ROOT_USERNAME" ] && [ "$MONGO_INITDB_ROOT_PASSWORD" ]; then
